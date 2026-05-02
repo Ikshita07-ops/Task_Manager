@@ -209,10 +209,6 @@ body{
         <!-- Tasks -->
         <div class="list" id="list"></div>
 
-        <div class="footer">
-            dark theme task manager
-        </div>
-
     </div>
 
 </div>
