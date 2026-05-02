@@ -1,73 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Task Manager</title>
+<title>Task Manager Pro</title>
 
 <style>
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background:#eef1f5;
+    background:linear-gradient(130deg,#0b132b,#1e1b4b);
+    color:#e0e7ff;
 }
 
-/* Container */
+/* Layout */
 .container{
-    max-width:500px;
-    margin:60px auto;
-    background:white;
+    width:900px;
+    margin:40px auto;
+    display:flex;
+    gap:20px;
+}
+
+/* Sidebar */
+.sidebar{
+    width:220px;
+    background:#111827;
+    padding:15px;
+    border-radius:10px;
+}
+
+.sidebar h3{
+    margin-bottom:10px;
+    color:#a5b4fc;
+}
+
+.sidebar div{
+    padding:8px;
+    margin:5px 0;
+    cursor:pointer;
+}
+
+.sidebar div:hover{
+    background:#1f2937;
+}
+
+/* Main Box */
+.main{
+    flex:1;
+    background:#1e293b;
     padding:20px;
-    border-radius:8px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    border-radius:10px;
 }
 
-/* Title */
-h2{
-    margin-bottom:15px;
+/* Header */
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-/* Input */
-.input-box{
+.top h2{
+    color:#a5b4fc;
+}
+
+/* Input Section */
+.input{
+    margin-top:15px;
     display:flex;
     gap:10px;
 }
 
-.input-box input{
+.input input{
     flex:1;
-    padding:8px;
-    border:1px solid #ccc;
+    padding:10px;
+    background:#0f172a;
+    border:none;
+    color:white;
 }
 
-.input-box button{
-    padding:8px 15px;
+.input select{
+    padding:10px;
+    background:#0f172a;
     border:none;
-    background:#333;
+    color:white;
+}
+
+.input button{
+    padding:10px;
+    border:none;
+    background:#6366f1;
     color:white;
     cursor:pointer;
 }
 
-/* Tasks */
-.task{
-    margin-top:10px;
-    padding:10px;
-    background:#f7f7f7;
-    display:flex;
-    justify-content:space-between;
-    border:1px solid #ddd;
+.input button:hover{
+    background:#4f46e5;
 }
 
-.task.done{
+/* Stats */
+.stats{
+    margin-top:15px;
+    display:flex;
+    gap:10px;
+}
+
+.stat{
+    flex:1;
+    background:#0f172a;
+    padding:10px;
+    text-align:center;
+}
+
+/* Task List */
+.list{
+    margin-top:20px;
+}
+
+/* Task Card */
+.task{
+    background:#0f172a;
+    padding:12px;
+    margin-bottom:10px;
+    border-left:5px solid #6366f1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* Priority Colors */
+.high{ border-color:#ef4444; }
+.medium{ border-color:#f59e0b; }
+.low{ border-color:#22c55e; }
+
+/* Text */
+.task span{
+    cursor:pointer;
+}
+
+/* Done */
+.done{
     text-decoration:line-through;
-    color:gray;
+    color:#9ca3af;
+}
+
+/* Buttons */
+.actions button{
+    margin-left:5px;
+    border:none;
+    padding:5px 8px;
+    cursor:pointer;
+}
+
+.del{
+    background:#ef4444;
+    color:white;
+}
+
+.del:hover{
+    background:#dc2626;
 }
 
 /* Footer */
 .footer{
     text-align:center;
-    margin-top:15px;
+    margin-top:10px;
     font-size:12px;
-    color:#888;
+    color:#94a3b8;
 }
 </style>
 </head>
@@ -75,45 +171,90 @@ h2{
 <body>
 
 <div class="container">
-    <h2>My Tasks</h2>
 
-    <div class="input-box">
-        <input type="text" id="taskInput" placeholder="Enter task">
-        <button onclick="addTask()">Add</button>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3>Menu</h3>
+        <div>All Tasks</div>
+        <div>Important</div>
+        <div>Completed</div>
     </div>
 
-    <div id="taskList"></div>
+    <!-- Main -->
+    <div class="main">
 
-    <div class="footer">
-        Simple Task Manager
+        <div class="top">
+            <h2>Task Manager</h2>
+        </div>
+
+        <!-- Input -->
+        <div class="input">
+            <input type="text" id="taskInput" placeholder="Enter task">
+            
+            <select id="priority">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <button onclick="addTask()">Add</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">Total: <span id="total">0</span></div>
+            <div class="stat">Done: <span id="done">0</span></div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="list" id="list"></div>
+
+        <div class="footer">
+            dark theme task manager
+        </div>
+
     </div>
+
 </div>
 
 <script>
+function updateStats(){
+    let tasks=document.querySelectorAll(".task");
+    let done=document.querySelectorAll(".done");
+
+    document.getElementById("total").innerText=tasks.length;
+    document.getElementById("done").innerText=done.length;
+}
+
 function addTask(){
-    let input = document.getElementById("taskInput");
-    let taskText = input.value.trim();
+    let text=document.getElementById("taskInput").value;
+    let pr=document.getElementById("priority").value;
 
-    if(taskText === "") return;
+    if(text=="") return;
 
-    let taskDiv = document.createElement("div");
-    taskDiv.className = "task";
+    let div=document.createElement("div");
+    div.className="task "+pr;
 
-    taskDiv.innerHTML = `
-        <span onclick="toggleTask(this)">${taskText}</span>
-        <button onclick="deleteTask(this)">X</button>
+    div.innerHTML=`
+        <span onclick="toggle(this)">${text}</span>
+        <div class="actions">
+            <button class="del" onclick="removeTask(this)">x</button>
+        </div>
     `;
 
-    document.getElementById("taskList").appendChild(taskDiv);
-    input.value = "";
+    document.getElementById("list").appendChild(div);
+    document.getElementById("taskInput").value="";
+    updateStats();
 }
 
-function toggleTask(el){
-    el.parentElement.classList.toggle("done");
+function toggle(el){
+    el.classList.toggle("done");
+    updateStats();
 }
 
-function deleteTask(el){
-    el.parentElement.remove();
+function removeTask(el){
+    el.parentElement.parentElement.remove();
+    updateStats();
 }
 </script>
 
